@@ -6,15 +6,7 @@ const cors = require('cors');
 const app = express();
 const cronjobs = require("./cronjobs");
 const path = require("path")
-const db = mysql.createPool({
-    host:"us-cdbr-east-05.cleardb.net",
-    user:"b87a49d32dc394",
-    password:"88cda7e5",
-    database:'heroku_ab9c95c83166842',
-    waitForConnections:true,
-    connectionLimit: 10,
-    queueLimit:0
-})
+
 
 app.use(cors())
 app.use(express.urlencoded({
