@@ -7,8 +7,8 @@ async function main(recipent,mail_data,new_price){
         service:"gmail",
         host:"smtp.google.com",
         auth:{
-            user:"experimental.vilas@gmail.com",
-            pass:"Vvilas123#@123",
+            user:"",
+            pass:"",
         }
     }));
 
