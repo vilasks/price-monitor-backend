@@ -6,6 +6,7 @@ const cors = require('cors');
 const app = express();
 const cronjobs = require("./cronjobs");
 const path = require("path")
+
 const db = mysql.createPool({
     host:"us-cdbr-east-05.cleardb.net",
     user:"b87a49d32dc394",
@@ -24,13 +25,7 @@ app.use(express.json())
 
 let port = process.env.PORT||3333;
 
-// const db = mysql.createConnection({
-//     host:"127.0.0.1",
-//     port:3306,
-//     user:"root",
-//     password:"vvilas122",
-//     database:'world'
-// })
+
 
 
 
