@@ -1,4 +1,6 @@
 const express = require('express')
+const randomstr = require('randomstring')
+const crypto = require('crypto')
 const mysql = require('mysql2')
 var scrape = require('./getprice');
 const CronJob = require('cron').CronJob;
@@ -25,7 +27,23 @@ app.use(express.json())
 
 let port = process.env.PORT||3333;
 
+function hash_function(phrase){
+    const hash = crypto.createHash('sha256')
+    const hashed_phrase = hash.update(phrase).digest('base64')
+    return hashed_phrase
+}
 
+function hash_password(pass){
+    const len = crypto.randomInt(12,20)
+    const salt = randomstr.generate({
+        length:len,
+        charset:"alphanumeric"
+    })
+    const salt_pass = salt+pass
+    const hash = hash_function(salt_pass)
+    return [salt,hash]
+
+}
 
 
 
@@ -37,6 +55,7 @@ job.start();
 app.get("*",(req,res)=>{
     res.send("Nothing here")
 })
+
 
 app.post("/",(req,res)=>{
     let q = `SELECT userid FROM users where userid="${req.body.user}"`
@@ -137,7 +156,7 @@ app.post("/add",(req,res)=>{
 })
 
 app.post("/login",(req,res)=>{
-    let query = `Select userid from users where userid="${req.body.user}" and password="${req.body.password}"`
+    let query = `Select password,salt from users where userid="${req.body.user}"`
     
     db.query(query,(err,response)=>{
         if(err){
@@ -150,9 +169,17 @@ app.post("/login",(req,res)=>{
                 
                 res.send(tosend)
             }else{
-                const tosend = JSON.stringify({"res":response[0]})
-                
+
+                const passCheck = response[0].salt+req.body.password
+                console.log(`${response[0].salt} , ${req.body.password}`)
+                console.log(`${response[0].password}, ${hash_function(passCheck)}`)
+                if (response[0].password===hash_function(passCheck)){
+                const tosend = JSON.stringify({"res":req.body.user})
                 res.send(tosend);
+                }else{
+                    res.send({"res":""})
+                }
+
             }
         }
     })
@@ -160,7 +187,12 @@ app.post("/login",(req,res)=>{
 
 
 app.post("/signup",(req,res)=>{
-    let query = `insert users values("${req.body.user}","${req.body.password}","${req.body.email}")`;
+
+
+
+    const [salt,password] = hash_password(req.body.password)
+
+    let query = `insert users values("${req.body.user}","${password}","${req.body.email}","${salt}")`;
     
     db.query(query,(error,response)=>{
         
