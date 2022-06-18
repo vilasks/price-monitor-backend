@@ -9,15 +9,6 @@ const app = express();
 const cronjobs = require("./cronjobs");
 const path = require("path")
 
-const db = mysql.createPool({
-    host:"us-cdbr-east-05.cleardb.net",
-    user:"b87a49d32dc394",
-    password:"88cda7e5",
-    database:'heroku_ab9c95c83166842',
-    waitForConnections:true,
-    connectionLimit: 10,
-    queueLimit:0
-})
 
 app.use(cors())
 app.use(express.urlencoded({
@@ -45,17 +36,12 @@ function hash_password(pass){
 
 }
 
-
-
-
-
 let job = new CronJob("* 10 * * * *",function(){cronjobs(db)},null,true,null,null,true);
 job.start();
 
 app.get("*",(req,res)=>{
     res.send("Nothing here")
 })
-
 
 app.post("/",(req,res)=>{
     let q = `SELECT userid FROM users where userid="${req.body.user}"`
@@ -85,8 +71,6 @@ app.post("/",(req,res)=>{
     })
     
 })
-
-
 
 app.post("/vilas",async(req,res)=>{
     
